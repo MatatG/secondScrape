@@ -8,7 +8,11 @@ import csv
 from io import StringIO
 import tiktoken
 import logging
+import os
+from dotenv import load_dotenv
 
+# Load environment variables
+load_dotenv()
 
 from datetime import datetime
 
@@ -113,7 +117,7 @@ class TokenTracker:
 token_tracker = TokenTracker()
 
 def analyze_with_claude(html_content, url, context=""):
-    client = anthropic.Anthropic()
+    client = anthropic.Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
     model = "claude-3-5-haiku-20241022"  # Specify the model explicitly
     
     system_prompt = """You are a focused web scraping assistant. You work for a company making a list of all accommodations world wide. Your goal is to find hotel room names and details.
@@ -150,7 +154,7 @@ def analyze_with_claude(html_content, url, context=""):
     }
 
 def structure_room_data(analysis_text):
-    client = anthropic.Anthropic()
+    client = anthropic.Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
     model = "claude-3-5-haiku-20241022"
     
     system_prompt = """You are a data structuring assistant. Convert the hotel room information into a CSV format with the following fields:
@@ -335,4 +339,5 @@ def download_csv():
     )
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
